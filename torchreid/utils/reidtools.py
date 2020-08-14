@@ -13,7 +13,7 @@ QUERY_EXTRA_SPACING = 90
 BW = 5 # border width
 GREEN = (0, 255, 0)
 RED = (0, 0, 255)
-
+BLUE = (255, 0, 0)
 
 def visualize_ranked_results(
     distmat, dataset, data_type, width=128, height=256, save_dir='', topk=10
@@ -82,10 +82,17 @@ def visualize_ranked_results(
         ) else qimg_path
 
         if data_type == 'image':
+            border_color_q = (0, 0, 0)
+            if qcamid == 0:
+                border_color_q = RED
+            elif qcamid == 1:
+                border_color_q = GREEN
+            elif qcamid == 2:
+                border_color_q = BLUE
             qimg = cv2.imread(qimg_path)
             qimg = cv2.resize(qimg, (width, height))
             qimg = cv2.copyMakeBorder(
-                qimg, BW, BW, BW, BW, cv2.BORDER_CONSTANT, value=(0, 0, 0)
+                qimg, BW, BW, BW, BW, cv2.BORDER_CONSTANT, value=border_color_q
             )
             # resize twice to ensure that the border width is consistent across images
             qimg = cv2.resize(qimg, (width, height))
@@ -113,7 +120,14 @@ def visualize_ranked_results(
             if not invalid:
                 matched = gpid == qpid
                 if data_type == 'image':
-                    border_color = GREEN if matched else RED
+                    # border_color = GREEN if matched else RED
+                    border_color = (0, 0, 0)
+                    if gcamid == 0:
+                        border_color = RED
+                    elif gcamid == 1:
+                        border_color = GREEN
+                    elif gcamid == 2:
+                        border_color = BLUE
                     gimg = cv2.imread(gimg_path)
                     gimg = cv2.resize(gimg, (width, height))
                     gimg = cv2.copyMakeBorder(
