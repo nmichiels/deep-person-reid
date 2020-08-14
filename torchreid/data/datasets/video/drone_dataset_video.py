@@ -30,21 +30,24 @@ class DroneDataset(VideoDataset):
         
         currentPid = 0
         currentCamId = 0
+        currentFrameId = 0
         tracklets = []
         img_paths = []
         for i in range(0, data.shape[0]):
             pid = data[i,2]
             camid = data[i,1]
+            frameid = data[i,3]-1
             img_path = path + '/' + 'view%d/'%camid + str(data[i,0]) + ".jpg"
             
             
             if pid == currentPid:
                 img_paths.append(img_path)
             else:
-                tracklets.append((img_paths, currentPid, currentCamId))
+                tracklets.append((img_paths, currentPid, currentCamId, currentFrameId))
                 img_paths = []
                 img_paths.append(img_path)
                 currentCamId = camid
+                currentFrameId = frameid
                 currentPid = pid
                 
               
