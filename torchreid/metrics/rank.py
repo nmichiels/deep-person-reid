@@ -116,15 +116,17 @@ def eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank):
         # get query pid and camid
         q_pid = q_pids[q_idx]
         q_camid = q_camids[q_idx]
-
+        print("test", q_pid, q_camid)
         # remove gallery samples that have the same pid and camid with query
         order = indices[q_idx]
         remove = (g_pids[order] == q_pid) & (g_camids[order] == q_camid)
+        
+        print("remove", remove)
         keep = np.invert(remove)
 
         # compute cmc curve
-        raw_cmc = matches[q_idx][
-            keep] # binary vector, positions with value 1 are correct matches
+        print("matches", matches)
+        raw_cmc = matches[q_idx][keep] # binary vector, positions with value 1 are correct matches
         if not np.any(raw_cmc):
             # this condition is true when query identity does not appear in gallery
             continue
@@ -200,6 +202,7 @@ def evaluate_rank(
             distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
             use_metric_cuhk03
         )
+
     else:
         return evaluate_py(
             distmat, q_pids, g_pids, q_camids, g_camids, max_rank,

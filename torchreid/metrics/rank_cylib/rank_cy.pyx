@@ -1,14 +1,13 @@
 # cython: boundscheck=False, wraparound=False, nonecheck=False, cdivision=True
 
 from __future__ import print_function
-import numpy as np
 
 import cython
-
+import numpy as np
 cimport numpy as np
-
-import random
 from collections import defaultdict
+import random
+
 
 """
 Compiler directives:
@@ -24,10 +23,10 @@ Credit to https://github.com/luzai
 # Main interface
 cpdef evaluate_cy(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, use_metric_cuhk03=False):
     distmat = np.asarray(distmat, dtype=np.float32)
-    q_pids = np.asarray(q_pids, dtype=np.int64)
-    g_pids = np.asarray(g_pids, dtype=np.int64)
-    q_camids = np.asarray(q_camids, dtype=np.int64)
-    g_camids = np.asarray(g_camids, dtype=np.int64)
+    q_pids = np.asarray(q_pids, dtype=np.int32)
+    g_pids = np.asarray(g_pids, dtype=np.int32)
+    q_camids = np.asarray(q_camids, dtype=np.int32)
+    g_camids = np.asarray(g_camids, dtype=np.int32)
     if use_metric_cuhk03:
         return eval_cuhk03_cy(distmat, q_pids, g_pids, q_camids, g_camids, max_rank)
     return eval_market1501_cy(distmat, q_pids, g_pids, q_camids, g_camids, max_rank)
@@ -45,15 +44,15 @@ cpdef eval_cuhk03_cy(float[:,:] distmat, long[:] q_pids, long[:]g_pids,
     
     cdef:
         long num_repeats = 10
-        long[:,:] indices = np.argsort(distmat, axis=1)
-        long[:,:] matches = (np.asarray(g_pids)[np.asarray(indices)] == np.asarray(q_pids)[:, np.newaxis]).astype(np.int64)
+        long[:,:] indices = np.argsort(distmat, axis=1).astype(np.int32)
+        long[:,:] matches = (np.asarray(g_pids)[np.asarray(indices)] == np.asarray(q_pids)[:, np.newaxis]).astype(np.int32)
 
         float[:,:] all_cmc = np.zeros((num_q, max_rank), dtype=np.float32)
         float[:] all_AP = np.zeros(num_q, dtype=np.float32)
         float num_valid_q = 0. # number of valid query
 
         long q_idx, q_pid, q_camid, g_idx
-        long[:] order = np.zeros(num_g, dtype=np.int64)
+        long[:] order = np.zeros(num_g, dtype=np.int32)
         long keep
 
         float[:] raw_cmc = np.zeros(num_g, dtype=np.float32) # binary vector, positions with value 1 are correct matches
@@ -78,7 +77,7 @@ cpdef eval_cuhk03_cy(float[:,:] distmat, long[:] q_pids, long[:]g_pids,
             order[g_idx] = indices[q_idx, g_idx]
         num_g_real = 0
         meet_condition = 0
-        kept_g_pids = np.zeros(num_g, dtype=np.int64)
+        kept_g_pids = np.zeros(num_g, dtype=np.int32)
 
         for g_idx in range(num_g):
             if (g_pids[order[g_idx]] != q_pid) or (g_camids[order[g_idx]] != q_camid):
@@ -99,7 +98,7 @@ cpdef eval_cuhk03_cy(float[:,:] distmat, long[:] q_pids, long[:]g_pids,
 
         cmc = np.zeros(max_rank, dtype=np.float32)
         for _ in range(num_repeats):
-            mask = np.zeros(num_g_real, dtype=np.int64)
+            mask = np.zeros(num_g_real, dtype=np.int32)
             
             for _, idxs in g_pids_dict.items():
                 # randomly sample one image for each gallery person
@@ -163,15 +162,15 @@ cpdef eval_market1501_cy(float[:,:] distmat, long[:] q_pids, long[:]g_pids,
         print('Note: number of gallery samples is quite small, got {}'.format(num_g))
     
     cdef:
-        long[:,:] indices = np.argsort(distmat, axis=1)
-        long[:,:] matches = (np.asarray(g_pids)[np.asarray(indices)] == np.asarray(q_pids)[:, np.newaxis]).astype(np.int64)
+        long[:,:] indices = np.argsort(distmat, axis=1).astype(np.int32)
+        long[:,:] matches = (np.asarray(g_pids)[np.asarray(indices)] == np.asarray(q_pids)[:, np.newaxis]).astype(np.int32)
 
         float[:,:] all_cmc = np.zeros((num_q, max_rank), dtype=np.float32)
         float[:] all_AP = np.zeros(num_q, dtype=np.float32)
         float num_valid_q = 0. # number of valid query
 
         long q_idx, q_pid, q_camid, g_idx
-        long[:] order = np.zeros(num_g, dtype=np.int64)
+        long[:] order = np.zeros(num_g, dtype=np.int32)
         long keep
 
         float[:] raw_cmc = np.zeros(num_g, dtype=np.float32) # binary vector, positions with value 1 are correct matches
@@ -198,7 +197,7 @@ cpdef eval_market1501_cy(float[:,:] distmat, long[:] q_pids, long[:]g_pids,
             if (g_pids[order[g_idx]] != q_pid) or (g_camids[order[g_idx]] != q_camid):
                 raw_cmc[num_g_real] = matches[q_idx][g_idx]
                 num_g_real += 1
-                if matches[q_idx][g_idx] > 1e-31:
+                if matches[q_idx][g_idx] > 1e-5:
                     meet_condition = 1
         
         if not meet_condition:
