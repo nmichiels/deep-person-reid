@@ -43,7 +43,6 @@ def get_default_config():
     cfg.sampler.train_sampler_t = 'RandomSampler' # sampler for target train loader
     cfg.sampler.num_instances = 4 # number of instances per identity for RandomIdentitySampler
     cfg.sampler.num_cams = 1 # number of cameras to sample in a batch (for RandomDomainSampler)
-    cfg.sampler.num_datasets = 1 # number of datasets to sample in a batch (for RandomDatasetSampler)
 
     # video reid setting
     cfg.video = CN()
@@ -103,7 +102,7 @@ def get_default_config():
     cfg.test.eval_freq = -1 # evaluation frequency (-1 means to only test after training)
     cfg.test.start_eval = 0 # start to evaluate after a specific epoch
     cfg.test.rerank = False # use person re-ranking
-    cfg.test.visrank = False # visualize ranked results (only available when cfg.test.evaluate=True)
+    cfg.test.visrank = True # visualize ranked results (only available when cfg.test.evaluate=True)
     cfg.test.visrank_topk = 10 # top-k ranks to visualize
 
     return cfg
@@ -129,10 +128,9 @@ def imagedata_kwargs(cfg):
         'workers': cfg.data.workers,
         'num_instances': cfg.sampler.num_instances,
         'num_cams': cfg.sampler.num_cams,
-        'num_datasets': cfg.sampler.num_datasets,
         'train_sampler': cfg.sampler.train_sampler,
         'train_sampler_t': cfg.sampler.train_sampler_t,
-        # image dataset specific
+        # image
         'cuhk03_labeled': cfg.cuhk03.labeled_images,
         'cuhk03_classic_split': cfg.cuhk03.classic_split,
         'market1501_500k': cfg.market1501.use_500k_distractors,
@@ -157,9 +155,8 @@ def videodata_kwargs(cfg):
         'workers': cfg.data.workers,
         'num_instances': cfg.sampler.num_instances,
         'num_cams': cfg.sampler.num_cams,
-        'num_datasets': cfg.sampler.num_datasets,
         'train_sampler': cfg.sampler.train_sampler,
-        # video dataset specific
+        # video
         'seq_len': cfg.video.seq_len,
         'sample_method': cfg.video.sample_method
     }

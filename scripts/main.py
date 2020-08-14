@@ -5,6 +5,7 @@ import argparse
 import torch
 import torch.nn as nn
 
+from torchreid.data.datasets.image.drone_dataset import DroneDataset
 import torchreid
 from torchreid.utils import (
     Logger, check_isfile, set_random_seed, collect_env_info,
@@ -15,6 +16,8 @@ from default_config import (
     imagedata_kwargs, optimizer_kwargs, videodata_kwargs, engine_run_kwargs,
     get_default_config, lr_scheduler_kwargs
 )
+
+torchreid.data.register_image_dataset('drone_dataset', DroneDataset)
 
 
 def build_datamanager(cfg):
