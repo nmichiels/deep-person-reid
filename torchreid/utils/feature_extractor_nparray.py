@@ -112,7 +112,8 @@ class FeatureExtractorArray(object):
             images = []
 
             for element in input:
-                image = self.preprocess(element)
+                pilimage = Image.fromarray(element.astype('uint8'), 'RGB')
+                image = self.preprocess(pilimage)
                 images.append(image)
 
             images = torch.stack(images, dim=0)
@@ -139,4 +140,5 @@ class FeatureExtractorArray(object):
         with torch.no_grad():
             features = self.model(images)
 
+        del images
         return features
