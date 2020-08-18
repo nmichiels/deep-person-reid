@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 import torch
 from torch.nn import functional as F
-
+import numpy as np
 
 def compute_distance_matrix(input1, input2, metric='euclidean'):
     """A wrapper function for computing distance matrix.
@@ -22,6 +22,13 @@ def compute_distance_matrix(input1, input2, metric='euclidean'):
        >>> distmat = metrics.compute_distance_matrix(input1, input2)
        >>> distmat.size() # (10, 100)
     """
+    
+    if isinstance(input1, np.ndarray):
+        input1 = torch.from_numpy(input1)
+    if isinstance(input2, np.ndarray):
+        input2 = torch.from_numpy(input2)
+        
+        
     # check input
     assert isinstance(input1, torch.Tensor)
     assert isinstance(input2, torch.Tensor)
