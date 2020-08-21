@@ -81,6 +81,11 @@ def cosine_distance(input1, input2):
     Returns:
         torch.Tensor: distance matrix.
     """
+    if isinstance(input1, np.ndarray):
+        input1 = torch.from_numpy(input1)
+    if isinstance(input2, np.ndarray):
+        input2 = torch.from_numpy(input2)
+        
     input1_normed = F.normalize(input1, p=2, dim=1)
     input2_normed = F.normalize(input2, p=2, dim=1)
     distmat = 1 - torch.mm(input1_normed, input2_normed.t())
